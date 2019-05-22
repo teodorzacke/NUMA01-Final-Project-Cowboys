@@ -1,0 +1,34 @@
+from tkinter import *
+import tkinter
+from tkinter import ttk, messagebox
+from  scipy import *
+from  pylab import *
+from numpy import *
+
+import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
+import datetime
+from pytz import timezone
+from dateutil.parser import parse
+import pandas as pd
+
+def merge_columns(df, col_1 ="Date", col_2 ="Time", col_new ="DateTime"):
+    df[col_new] = df[col_1] + " " + df[col_2]
+    del df[col_1]
+    del df[col_2]
+    return(df)
+    
+merge_columns(df)
+df["DateTime"] = pd.to_datetime((df["DateTime"]),utc=True, format=("%Y-%m-%d %H:%M:%S.%f"))
+
+def insert_row(df, row_number, row_value): 
+    df1 = df[:row_number] 
+    df2 = df[row_number:] 
+    df1.loc[row_number]=row_value 
+    df_result = pd.concat([df1, df2]) 
+    df_result.index = [*range(df_result.shape[0])] 
+    return df_result 
+
+for i in range(len(df.DateTime)-1):
+    if (df.DateTime[i+1].minute-df.DateTime[i].minute)>=3:
+        df = insert_row(df,i+1,[((df.Movement[i]+df.Movement[i+1])/2),(df.DateTime[i]+datetime.timedelta(minutes=((df.DateTime[i+1].minute-df.DateTime[i].minute)/2)))])
