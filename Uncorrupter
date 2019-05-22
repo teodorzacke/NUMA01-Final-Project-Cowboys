@@ -12,6 +12,8 @@ from pytz import timezone
 from dateutil.parser import parse
 import pandas as pd
 
+df=pd.read_csv('C:/Users/johan/OneDrive/Skrivbord/bajsilajs.txt', delim_whitespace = True, names = ('Date','Time','Movement'))
+
 def merge_columns(df, col_1 ="Date", col_2 ="Time", col_new ="DateTime"):
     df[col_new] = df[col_1] + " " + df[col_2]
     del df[col_1]
@@ -31,4 +33,7 @@ def insert_row(df, row_number, row_value):
 
 for i in range(len(df.DateTime)-1):
     if (df.DateTime[i+1].minute-df.DateTime[i].minute)>=3:
-        df = insert_row(df,i+1,[((df.Movement[i]+df.Movement[i+1])/2),(df.DateTime[i]+datetime.timedelta(minutes=((df.DateTime[i+1].minute-df.DateTime[i].minute)/2)))])
+        avgie = ((df.Movement[i]+df.Movement[i+1])/2)
+        timie = (df.DateTime[i]+datetime.timedelta(minutes=((df.DateTime[i+1].minute-df.DateTime[i].minute)/2)))
+        df = insert_row(df,i+1,[avgie,timie])
+
