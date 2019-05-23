@@ -4,7 +4,6 @@ from tkinter import ttk, messagebox
 from  scipy import *
 from  pylab import *
 from numpy import *
-
 import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter
 import datetime
@@ -32,8 +31,7 @@ def insert_row(df, row_number, row_value):
     return df_result 
 
 for i in range(len(df.DateTime)-1):
-    if (df.DateTime[i+1].minute-df.DateTime[i].minute)>=3:
-        avgie = ((df.Movement[i]+df.Movement[i+1])/2)
-        timie = (df.DateTime[i]+datetime.timedelta(minutes=((df.DateTime[i+1].minute-df.DateTime[i].minute)/2)))
-        df = insert_row(df,i+1,[avgie,timie])
-
+    if (df.DateTime[i+1].minute - df.DateTime[i].minute) >= 3:
+        avgie = ((df.Movement[i] + df.Movement[i+1])/2)
+        timie = (df.DateTime[i] + datetime.timedelta(minutes = ((df.DateTime[i+1].minute - df.DateTime[i].minute)/2)))
+        df = insert_row(df, i+1, [avgie,timie])
