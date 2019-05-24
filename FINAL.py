@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu May 23 19:43:59 2019
-@author: stina, todd, marre, nikolaj, pontan, tindra, joppe
+Created on Fri May 24 18:00:18 2019
+@author: stina
 """
 from  scipy import *
 from  matplotlib.pyplot import *
@@ -128,40 +128,50 @@ def whatThatSunDo(df):
     print('Information for %s' % location.name)
     print('Timezone: %s' % timezone)
     print('Latitude: %.3f; Longitude: %.3f' % (location.latitude, location.longitude))
+    #Skapat en location (med tidszon) för att plocka soluppgång och solnedgångs värden från.
     
-    chirre = []
-    if not "DateTime" in df:
+    rise = []
+    if not "DateTime" in df: #Försäkrar oss om att vi inte har "DateTime" som vår index (då detta används i vissa delar av vår kod). Så vi återställer den till vanlig index.
         df = df.reset_index()
-    birre = []
-    for i in range(df.shape[0]-1):
-        if df.DateTime[i].day != df.DateTime[i+1].day:
-            sun = location.sun(date=df.DateTime[i].date())
-            sunrise = sun['sunrise']
-            chirre.append(sunrise)
+    sett = []
+    sun = location.sun(date=df.DateTime[0].date()) #Sätter och kollar första datum för vi saknar ett värde i vår lista.
+    rise.append(sun['sunrise']) #Appendar första datumet till våra listor.
+    sett.append(sun['sunset'])
+    for i in range(1, df.shape[0]): #Börjar på 1 och kör i en range hela df listan (så df-1).
+        if df.DateTime[i-1].day != df.DateTime[i].day: #Kollar om i-1 är en annan dag gämfört med i.
+            sun = location.sun(date=df.DateTime[i].date()) #Appendar vår location med sun fucntionen som jag tror finns i astral. Sätter alla datum till datumen från vår df.
+            sunrise = sun['sunrise'] #Astrals function för att kolla sunrise och sunset för olika datum.
+            rise.append(sunrise) #Appendar till våra listor för alla datum i df.
             sunset = sun['sunset']
-            birre.append(sunset)
-    return list(zip(birre,chirre))
+            sett.append(sunset)
+#            print(df.DateTime[i].day)
+#            print('Sunrise: {} Sunset: {}'.format(sunrise, sunset))
+    sun = location.sun(date=(df.iloc[-1].DateTime + timedelta(days = 1)).date()) #gör ett nytt datum som är sista datumet för vi behöver en extra. Så sista datumet i listan + en dag.
+    rise.append(sun['sunrise'])#Appendar sista datumet i listorna.
+    sett.append(sun['sunset'])
+    return list(zip(sett,rise))
 
-def inint(df, start, stop, night=None):
-    if "DateTime" in df.columns:
+def KENT_AGENT(df, start, stop, night=None):
+    if "DateTime" in df.columns: #Om "DateTime" inte är vårt index så gör vi den till det. (För index räknas inte som column!)
         df.set_index('DateTime',inplace=True)
-    ttdf = df[start:stop].reset_index()
+    ttdf = df[start:stop].reset_index() #Vi behöver en temporär temporär indexerad dataframe som vi sedan kan skapa en lista av (xlist).
     fig, ax = plt.subplots()
-    barWidth = len(ttdf) * 0.005
+    barWidth = len(ttdf) * 0.0005 #Ändrar på barWidth. len() för då blir bredden i procent av x-axeln.
     xlist = [i for i in ttdf.DateTime]
     if night == True:
         span = whatThatSunDo(ttdf)
-        for i in range(len(span)-1):
-            plt.axvspan(span[i][0], span[i+1][1], facecolor = "grey", alpha = 0.5)
-    plt.bar(xlist, [i for i in ttdf.Data], width=barWidth) 
+        for i in range(len(span)): #Tog bort len() -1. Raden under kollar från span[i][0] vilket är solnedgång i rad [i] och span[i+1][1] vilket är soluppgång för nästa dag(rad). (Första bracketen säger vilken index i DateTime saken och andra är om det är solupp eller solner.) 
+            plt.axvspan(span[i][0], span[i+1][1], facecolor = "grey", alpha = 0.5) #axvspan är funktionen för att fylla i mellan solnedgång och soluppgång.
+    plt.bar(xlist, [i for i in ttdf.Data], width=barWidth) #Plottar vår Data från ttdf. Med DateTime som x-axel.
     plt.xticks(rotation = -45)
+
     
 if os.path.isfile("./tdf.pkl") and os.path.isfile("./hdf.pkl") and os.path.isfile("./ddf.pkl") and os.path.isfile("./wdf.pkl"):
     tdf, hdf, ddf, wdf = pd.read_pickle("./tdf.pkl"), pd.read_pickle("./hdf.pkl"), pd.read_pickle("./ddf.pkl"), pd.read_pickle("./wdf.pkl")
 else:
     print("Enter your file path.")
     inp = input()
-    hdf, ddf, wdf, hdf = snoppyboppy(inp)
+    hdf, ddf, wdf, tdf = snoppyboppy(inp)
     hdf.to_pickle("./hdf.pkl")
     ddf.to_pickle("./ddf.pkl")
     wdf.to_pickle("./wdf.pkl")
