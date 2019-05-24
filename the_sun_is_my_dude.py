@@ -24,14 +24,17 @@ print('Information for %s' % location.name)
 print('Timezone: %s' % timezone)
 print('Latitude: %.3f; Longitude: %.3f' % (location.latitude, location.longitude))
 
-
-
 def whatThatSunDo(df):
+    chirre = []
+    birre = []
     for i in range(df.shape[0]-1):
         if df.DateTime[i].day != df.DateTime[i+1].day:
             sun = location.sun(date=df.DateTime[i].date())
             sunrise = sun['sunrise']
+            chirre.append(sunrise)
             sunset = sun['sunset']
-            print('Sunset: {} Sunrise: {}'.format(sunrise, sunset))
+            birre.append(sunset)
+            #print('Sunset: {} Sunrise: {}'.format(sunrise, sunset))
+    return chirre, birre
 
 whatThatSunDo(df)
