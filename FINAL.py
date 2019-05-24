@@ -105,6 +105,7 @@ def timint(df, inp):
     dodi.DateTime = nytime
     return dodi
 
+#Slänger in alla våra previously definerade funktioner och spottar ut dataframes för data per ; timme, dag, vecka och 2minut.
 def snoppyboppy(path):
     df = pd.read_csv(path, delim_whitespace=True, names=("Date", "Time", "Data"))
     df = toDate(df) #Importerar till datetime obj.
@@ -119,7 +120,7 @@ def snoppyboppy(path):
     return hdf, ddf, wdf, tdf
 
 
-
+#Gör en lista med alla tider för soluppgång och solnedgång.
 def whatThatSunDo(df):
     location = Location(info = ('ICA Kvantum, Södra Dalby', 'Sweden', 55.717, 13.343, 'Europe/Stockholm', 0))
     location.timezone = 'Europe/Stockholm'
@@ -149,8 +150,10 @@ def whatThatSunDo(df):
     sun = location.sun(date=(df.iloc[-1].DateTime + timedelta(days = 1)).date()) #gör ett nytt datum som är sista datumet för vi behöver en extra. Så sista datumet i listan + en dag.
     rise.append(sun['dawn'])#Appendar sista datumet i listorna.
     sett.append(sun['dusk'])
-    return list(zip(sett,rise))
+    return list(zip(sett,rise)) #Vi zippar ihop dessa till en ny lista med tuples.
 
+#Fixar så att vi kan visa all data i plots med nattid som gråa bars. Välj df för h,d,w,t. night=True för att visa natt-bars. Justera width om det behövs. :)
+    
 def KENT_AGENT(df, start, stop, night=None):
     if "DateTime" in df.columns: #Om "DateTime" inte är vårt index så gör vi den till det. (För index räknas inte som column!)
         df.set_index('DateTime',inplace=True)
@@ -165,7 +168,7 @@ def KENT_AGENT(df, start, stop, night=None):
     plt.bar(xlist, [i for i in ttdf.Data], width=barWidth) #Plottar vår Data från ttdf. Med DateTime som x-axel.
     plt.xticks(rotation = -45)
 
-    
+#Om du inte har dessa filer på din dator så kommer du kunna skapa dem i en vald path. Du behöver bara göra detta en gång! Vilket gör att vår kod är mycket snabbare! :D    
 if os.path.isfile("./tdf.pkl") and os.path.isfile("./hdf.pkl") and os.path.isfile("./ddf.pkl") and os.path.isfile("./wdf.pkl"):
     tdf, hdf, ddf, wdf = pd.read_pickle("./tdf.pkl"), pd.read_pickle("./hdf.pkl"), pd.read_pickle("./ddf.pkl"), pd.read_pickle("./wdf.pkl")
 else:
