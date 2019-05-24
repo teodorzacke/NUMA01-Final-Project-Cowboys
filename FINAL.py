@@ -135,20 +135,20 @@ def whatThatSunDo(df):
         df = df.reset_index()
     sett = []
     sun = location.sun(date=df.DateTime[0].date()) #Sätter och kollar första datum för vi saknar ett värde i vår lista.
-    rise.append(sun['sunrise']) #Appendar första datumet till våra listor.
-    sett.append(sun['sunset'])
+    rise.append(sun['dawn']) #Appendar första datumet till våra listor.
+    sett.append(sun['dusk'])
     for i in range(1, df.shape[0]): #Börjar på 1 och kör i en range hela df listan (så df-1).
         if df.DateTime[i-1].day != df.DateTime[i].day: #Kollar om i-1 är en annan dag gämfört med i.
             sun = location.sun(date=df.DateTime[i].date()) #Appendar vår location med sun fucntionen som jag tror finns i astral. Sätter alla datum till datumen från vår df.
-            sunrise = sun['sunrise'] #Astrals function för att kolla sunrise och sunset för olika datum.
+            sunrise = sun['dawn'] #Astrals function för att kolla sunrise och sunset för olika datum.
             rise.append(sunrise) #Appendar till våra listor för alla datum i df.
-            sunset = sun['sunset']
+            sunset = sun['dusk']
             sett.append(sunset)
 #            print(df.DateTime[i].day)
 #            print('Sunrise: {} Sunset: {}'.format(sunrise, sunset))
     sun = location.sun(date=(df.iloc[-1].DateTime + timedelta(days = 1)).date()) #gör ett nytt datum som är sista datumet för vi behöver en extra. Så sista datumet i listan + en dag.
-    rise.append(sun['sunrise'])#Appendar sista datumet i listorna.
-    sett.append(sun['sunset'])
+    rise.append(sun['dawn'])#Appendar sista datumet i listorna.
+    sett.append(sun['dusk'])
     return list(zip(sett,rise))
 
 def KENT_AGENT(df, start, stop, night=None):
@@ -160,7 +160,7 @@ def KENT_AGENT(df, start, stop, night=None):
     xlist = [i for i in ttdf.DateTime]
     if night == True:
         span = whatThatSunDo(ttdf)
-        for i in range(len(span)): #Tog bort len() -1. Raden under kollar från span[i][0] vilket är solnedgång i rad [i] och span[i+1][1] vilket är soluppgång för nästa dag(rad). (Första bracketen säger vilken index i DateTime saken och andra är om det är solupp eller solner.) 
+        for i in range(len(span)-1): #Raden under kollar från span[i][0] vilket är solnedgång i rad [i] och span[i+1][1] vilket är soluppgång för nästa dag(rad). (Första bracketen säger vilken index i DateTime saken och andra är om det är solupp eller solner.) 
             plt.axvspan(span[i][0], span[i+1][1], facecolor = "grey", alpha = 0.5) #axvspan är funktionen för att fylla i mellan solnedgång och soluppgång.
     plt.bar(xlist, [i for i in ttdf.Data], width=barWidth) #Plottar vår Data från ttdf. Med DateTime som x-axel.
     plt.xticks(rotation = -45)
