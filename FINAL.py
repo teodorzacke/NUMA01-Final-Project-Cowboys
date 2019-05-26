@@ -155,16 +155,19 @@ def whatThatSunDo(df):
 #Fixar så att vi kan visa all data i plots med nattid som gråa bars. Välj df för h,d,w,t. night=True för att visa natt-bars. Justera width om det behövs. :)
     
 def KENT_AGENT(df, start, stop, night=None):
+    ddf = pd.read_pickle("./ddf.pkl")
+    ddf.set_index("DateTime", inplace=True)
     if "DateTime" in df.columns: #Om "DateTime" inte är vårt index så gör vi den till det. (För index räknas inte som column!)
         df.set_index('DateTime',inplace=True)
     ttdf = df[start:stop].reset_index() #Vi behöver en temporär temporär indexerad dataframe som vi sedan kan skapa en lista av (xlist).
     fig, ax = plt.subplots()
-    barWidth = len(ttdf) * 0.0005 #Ändrar på barWidth. len() för då blir bredden i procent av x-axeln.
     xlist = [i for i in ttdf.DateTime]
+    barWidth = np.min(np.diff(mdates.date2num(xlist))) #Ändrar på barWidth. len() för då blir bredden i procent av x-axeln.
     if night == True:
         span = whatThatSunDo(ttdf)
         for i in range(len(span)-1): #Raden under kollar från span[i][0] vilket är solnedgång i rad [i] och span[i+1][1] vilket är soluppgång för nästa dag(rad). (Första bracketen säger vilken index i DateTime saken och andra är om det är solupp eller solner.) 
             plt.axvspan(span[i][0], span[i+1][1], facecolor = "grey", alpha = 0.5) #axvspan är funktionen för att fylla i mellan solnedgång och soluppgång.
+        plt.axvspan(xlist[0], span[0][1], facecolor = "grey", alpha = 0.5)
     plt.bar(xlist, [i for i in ttdf.Data], width=barWidth) #Plottar vår Data från ttdf. Med DateTime som x-axel.
     plt.xticks(rotation = -45)
 
