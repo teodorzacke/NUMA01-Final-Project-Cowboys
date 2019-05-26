@@ -176,7 +176,7 @@ def plot(start, stop, night):
     dstop = datetime.datetime.strptime(stop, "%Y-%m-%d %H:%M:%S")
     if dstop - dstart <= datetime.timedelta(days = 7):
         KENT_AGENT(hdf, start, stop, night)
-    elif dstop - dstart > datetime.timedelta(days = 7) and dstop - dstart < datetime.timedelta(months = 6):
+    elif dstop - dstart > datetime.timedelta(days = 7) and dstop - dstart < datetime.timedelta(months = 182):
         KENT_AGENT(ddf, start, stop, night)
     else:
         KENT_AGENT(wdf, start, stop, night)
