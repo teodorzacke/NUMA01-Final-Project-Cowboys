@@ -171,6 +171,16 @@ def KENT_AGENT(df, start, stop, night=None):
     plt.bar(xlist, [i for i in ttdf.Data], width=barWidth) #Plottar vår Data från ttdf. Med DateTime som x-axel.
     plt.xticks(rotation = -45)
 
+def plot(start, stop, night):
+    dstart = datetime.datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+    dstop = datetime.datetime.strptime(stop, "%Y-%m-%d %H:%M:%S")
+    if dstop - dstart <= datetime.timedelta(days = 7):
+        KENT_AGENT(hdf, start, stop, night)
+    elif dstop - dstart > datetime.timedelta(days = 7) and dstop - dstart < datetime.timedelta(months = 6):
+        KENT_AGENT(ddf, start, stop, night)
+    else:
+        KENT_AGENT(wdf, start, stop, night)
+
 #Om du inte har dessa filer på din dator så kommer du kunna skapa dem i en vald path. Du behöver bara göra detta en gång! Vilket gör att vår kod är mycket snabbare! :D    
 if os.path.isfile("./tdf.pkl") and os.path.isfile("./hdf.pkl") and os.path.isfile("./ddf.pkl") and os.path.isfile("./wdf.pkl"):
     tdf, hdf, ddf, wdf = pd.read_pickle("./tdf.pkl"), pd.read_pickle("./hdf.pkl"), pd.read_pickle("./ddf.pkl"), pd.read_pickle("./wdf.pkl")
